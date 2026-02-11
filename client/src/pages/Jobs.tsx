@@ -13,7 +13,7 @@ export default function Jobs() {
     experience: '',
   });
 
-  const { data, isLoading } = useQuery(['jobs', filters], () =>
+  const { data, isLoading, error } = useQuery(['jobs', filters], () =>
     jobsAPI.getJobs(filters).then(res => res.data)
   );
 
@@ -95,6 +95,34 @@ export default function Jobs() {
         {isLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+            <p className="text-gray-600 mt-4">Loading jobs...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12 card">
+            <div className="text-red-600 mb-4">
+              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to Load Jobs</h3>
+            <p className="text-gray-600 mb-4">There was an error loading jobs. Please try:</p>
+            <ul className="text-left max-w-md mx-auto space-y-2 text-sm text-gray-600 mb-6">
+              <li>• Refreshing the page</li>
+              <li>• Logging out and logging back in</li>
+              <li>• Clearing your browser cache</li>
+            </ul>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="btn-primary"
+            >
+              Refresh Page
+            </button>
+          </div>
+        ) : !data?.jobs || data.jobs.length === 0 ? (
+          <div className="text-center py-12 card">
+            <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Jobs Found</h3>
+            <p className="text-gray-600">Try adjusting your filters or check back later for new opportunities.</p>
           </div>
         ) : (
           data?.jobs?.map((job: Job) => (
