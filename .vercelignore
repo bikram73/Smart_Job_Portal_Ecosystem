@@ -1,0 +1,13 @@
+node_modules
+.env
+.env.local
+*.log
+.DS_Store
+server/database.sqlite
+server/database.sqlite-journal
+*.bat
+TROUBLESHOOTING.md
+DEPLOY_BACKEND.md
+QUICK_DEPLOY.md
+FIX_JOBS_NOT_SHOWING.bat
+RESEED_JOBS.bat

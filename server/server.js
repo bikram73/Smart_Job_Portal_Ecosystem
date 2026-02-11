@@ -58,12 +58,20 @@ connectDB().then(async () => {
     await seedJobs();
   }
   
-  app.listen(PORT, () => {
-    console.log(`✓ Server running on http://localhost:${PORT}`);
-    console.log(`✓ Frontend should connect to http://localhost:3000`);
-    console.log(`✓ Database: SQLite (database.sqlite)`);
-  });
+  // Only start server if not in serverless environment (Vercel)
+  if (process.env.VERCEL !== '1') {
+    app.listen(PORT, () => {
+      console.log(`✓ Server running on http://localhost:${PORT}`);
+      console.log(`✓ Frontend should connect to http://localhost:3000`);
+      console.log(`✓ Database: SQLite (database.sqlite)`);
+    });
+  }
 }).catch(err => {
   console.error('Failed to start server:', err);
-  process.exit(1);
+  if (process.env.VERCEL !== '1') {
+    process.exit(1);
+  }
 });
+
+// Export for Vercel serverless
+module.exports = app;
