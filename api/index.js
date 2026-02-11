@@ -46,11 +46,21 @@ app.use(async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Database initialization error:', error);
-    res.status(500).json({ message: 'Database initialization failed' });
+    res.status(500).json({ 
+      message: 'Database initialization failed', 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
-// Routes
+// Request logging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
+// Routes - Vercel forwards /api/* to this function, so we need /api prefix
 app.use('/api/auth', require('../server/routes/auth'));
 app.use('/api/jobs', require('../server/routes/jobs'));
 app.use('/api/applications', require('../server/routes/applications'));
@@ -61,7 +71,27 @@ app.use('/api/roadmap', require('../server/routes/roadmap'));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is running on Vercel' });
+  res.json({ status: 'ok', message: 'Server is running on Vercel', timestamp: new Date().toISOString() });
+});
+
+// Root endpoint for testing
+app.get('/api', (req, res) => {
+  res.json({ message: 'API is running', endpoints: ['/api/health', '/api/auth/register', '/api/auth/login'] });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found', path: req.path });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ 
+    message: 'Internal server error', 
+    error: err.message,
+    path: req.path
+  });
 });
 
 module.exports = app;
