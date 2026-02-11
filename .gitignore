@@ -36,3 +36,9 @@ coverage/
 
 # Misc
 .cache/
+
+# Database
+server/database.sqlite
+server/database.sqlite-journal
+*.sqlite
+*.sqlite-journal
