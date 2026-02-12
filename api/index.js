@@ -23,6 +23,7 @@ let dbInitialized = false;
 
 async function initDB() {
   if (!dbInitialized) {
+    try {
     await connectDB();
     
     // Seed sample jobs on first run
@@ -36,6 +37,9 @@ async function initDB() {
     }
     
     dbInitialized = true;
+    } catch (error) {
+      console.error('Failed to initialize DB (likely due to Vercel read-only FS):', error.message);
+    }
   }
 }
 
@@ -95,4 +99,3 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
-

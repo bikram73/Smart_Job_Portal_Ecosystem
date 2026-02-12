@@ -4,6 +4,7 @@
   "description": "Intelligent Job Portal Ecosystem",
   "scripts": {
     "install-all": "npm install && cd client && npm install && cd ../server && npm install && cd ../api && npm install",
+    "postinstall": "cd server && npm install && cd ../api && npm install",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd server && npm run dev",
     "client": "cd client && npm run dev",
