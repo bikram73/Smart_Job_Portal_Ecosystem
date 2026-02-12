@@ -1,20 +1,36 @@
 const { Sequelize } = require('sequelize');
 const path = require('path');
+require('dotenv').config();
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: path.join(__dirname, '../database.sqlite'),
-  logging: false,
-});
+let sequelize;
+
+if (process.env.POSTGRES_URL) {
+  sequelize = new Sequelize(process.env.POSTGRES_URL, {
+    dialect: 'postgres',
+    logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    }
+  });
+} else {
+  sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: path.join(__dirname, '../database.sqlite'),
+    logging: false,
+  });
+}
 
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log('SQLite Database Connected');
+    console.log(process.env.POSTGRES_URL ? 'PostgreSQL Database Connected' : 'SQLite Database Connected');
     
     // Use force: true in development to recreate tables, or just sync normally
     const syncOptions = process.env.NODE_ENV === 'production' 
-      ? { alter: false } 
+      ? { alter: true } 
       : { force: false };
     
     await sequelize.sync(syncOptions);

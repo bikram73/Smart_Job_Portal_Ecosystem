@@ -16,7 +16,7 @@ async function reseed() {
       const newCount = await Job.count();
       console.log(`✓ Successfully seeded ${newCount} jobs!`);
     } else {
-      console.log('Jobs already exist. To reseed, delete database.sqlite and run again.');
+      console.log('Jobs already exist.');
       console.log('\nOr run: npm run reseed-force');
     }
     
