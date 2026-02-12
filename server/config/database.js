@@ -11,11 +11,17 @@ const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log('SQLite Database Connected');
-    await sequelize.sync({ alter: true });
+    
+    // Use force: true in development to recreate tables, or just sync normally
+    const syncOptions = process.env.NODE_ENV === 'production' 
+      ? { alter: false } 
+      : { force: false };
+    
+    await sequelize.sync(syncOptions);
     console.log('Database synced');
   } catch (error) {
     console.error('Database connection error:', error);
-    process.exit(1);
+    throw error; // Don't exit process in serverless environment
   }
 };
 
