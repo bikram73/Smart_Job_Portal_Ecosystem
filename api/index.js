@@ -38,7 +38,7 @@ async function initDB() {
     
     dbInitialized = true;
     } catch (error) {
-      console.error('Failed to initialize DB (likely due to Vercel read-only FS):', error.message);
+      console.error('Failed to initialize DB:', error.message);
     }
   }
 }
