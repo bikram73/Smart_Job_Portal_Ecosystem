@@ -17,6 +17,8 @@ A full-stack TypeScript/React job portal application with intelligent job matchi
 
 ![Smart-Job-Portal-Ecosystem](images/Dashboard.png)
 
+[![View More Images](https://img.shields.io/badge/View-More%20Images-blue)](MORE_IMAGES.md)
+
 </div>
 
 ---
