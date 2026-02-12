@@ -2,8 +2,6 @@
 
 # 🚀 Smart Job Portal Ecosystem
 
-![Smart-Job-Portal-Ecosystem](images/Dashboard.png)
-
 ### Your AI-Powered Career Companion
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
@@ -15,6 +13,9 @@
 A full-stack TypeScript/React job portal application with intelligent job matching, ATS-optimized resume builder, application tracking, and personalized learning roadmaps.
 
 [Features](#-features) • [Getting Started](#-getting-started) • [Tech Stack](#-tech-stack) • [API Docs](#-api-endpoints) • [Contributing](#-contributing)
+
+
+![Smart-Job-Portal-Ecosystem](images/Dashboard.png)
 
 </div>
 
