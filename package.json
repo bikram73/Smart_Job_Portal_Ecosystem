@@ -12,10 +12,17 @@
     "build:client": "cd client && npm run build",
     "vercel-build": "cd client && npm install && npm run build"
   },
-  "keywords": ["job-portal", "resume-builder", "job-tracker"],
+  "keywords": [
+    "job-portal",
+    "resume-builder",
+    "job-tracker"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@types/node": "^25.2.3",
+    "concurrently": "^8.2.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

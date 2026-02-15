@@ -1,0 +1,359 @@
+## Overview
+KodNestCareers is a unified placement platform combining Job Notification Tracker, Placement Readiness Platform, and AI Resume Builder. This project implements the requirements defined in `PRD-KNC-001`.
+
+## Architecture
+Based on Section 4 of the PRD, the system follows a modular service architecture:
+- **Experience Layer**: Web UI (React/Angular - to be implemented)
+- **Application Layer**: API Gateway, Auth, Orchestration (Spring Boot)
+- **Domain Engines**: Ingestion, Matching, Resume, Readiness
+
+## Modules Implemented (Phase 1 MVP)
+
+### 1. Job Notification Tracker
+- **Data Model**: `JobPosting` (Canonical schema for jobs)
+- **Functionality**: Ingestion skeleton, normalization.
+
+### 2. Identity & Profile
+- **Data Model**: `User`, `Profile`
+- **Functionality**: Role-based access (Student/Admin).
+
+### 3. AI Resume Builder
+- **Data Model**: `Resume`, `ResumeSection`
+- **Functionality**: Structure for ATS scoring.
+
+## Prerequisites
+- Java 17+
+- Maven 3.8+
+- Database (H2 for Dev, PostgreSQL for Prod)
+
+## Running the Application
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+## Roadmap
+- [ ] **Phase 1**: Core Auth, Job Ingestion, Basic Resume CRUD.
+- [ ] **Phase 2**: Ranking Engine, ATS Scoring Logic, Admin Reporting.
+- [ ] **Phase 3**: Advanced Personalization, Analytics.
+
+## References
+- Document ID: PRD-KNC-001
+- Version: 3.0 (Final)
+```
+
+#### 2. Backend Build Configuration
+Setting up the Spring Boot project with necessary dependencies for Data JPA, Validation, and Web.
+
+```diff
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.2</version>
+        <relativePath/>
+    </parent>
+    
+    <groupId>com.kodnest</groupId>
+    <artifactId>kodnest-careers</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>KodNestCareers</name>
+    <description>Unified Placement Platform Backend</description>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <dependencies>
+        <!-- Web API -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Persistence -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Validation (FR-102, FR-301) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Boilerplate reduction -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+#### 3. Application Entry Point
+
+```diff
+package com.kodnest.careers;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class KodNestCareersApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(KodNestCareersApplication.class, args);
+    }
+
+}
+```
+
+#### 4. Domain Model: User (Identity)
+Implements requirements from **Section 7.1 (Platform and Identity)**.
+
+```diff
+package com.kodnest.careers.domain.user;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "users")
+@Data
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role; // STUDENT, ADMIN (FR-002)
+
+    // Profile fields (FR-004)
+    private String fullName;
+    
+    @ElementCollection
+    private List<String> skills; // Skill taxonomy support
+
+    private LocalDateTime createdAt;
+    private LocalDateTime lastLogin;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+}
+
+enum UserRole {
+    STUDENT,
+    ADMIN
+}
+```
+
+#### 5. Domain Model: JobPosting (Job Tracker)
+Implements requirements from **Section 7.2 (Job Notification Tracker)** and **Section 6 (LLD)**.
+
+```diff
+package com.kodnest.careers.domain.job;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "job_postings")
+@Data
+public class JobPosting {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // Core Fields (FR-102: Canonical Schema)
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String company;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    private String location;
+    
+    private String employmentType; // Full-time, Internship
+
+    // Relevance Scoring Fields (FR-104)
+    @ElementCollection
+    private List<String> requiredSkills;
+    
+    private Integer minExperienceYears;
+
+    // Source Tracking (FR-101, FR-103)
+    private String sourceName; // e.g., "LinkedIn", "CompanySite"
+    
+    @Column(unique = true)
+    private String externalId; // For duplicate detection
+    
+    private String applicationUrl;
+
+    private LocalDateTime postedDate;
+    private LocalDateTime ingestedAt;
+
+    @Enumerated(EnumType.STRING)
+    private JobStatus status; // ACTIVE, EXPIRED
+
+    @PrePersist
+    protected void onCreate() {
+        ingestedAt = LocalDateTime.now();
+        if (status == null) status = JobStatus.ACTIVE;
+    }
+}
+
+enum JobStatus {
+    ACTIVE, EXPIRED, ARCHIVED
+}
+```
+
+#### 6. Domain Model: Resume (AI Resume Builder)
+Implements requirements from **Section 7.4 (AI Resume Builder)**.
+
+```diff
+package com.kodnest.careers.domain.resume;
+
+import com.kodnest.careers.domain.user.User;
+import jakarta.persistence.*;
+import lombok.Data;
+import java.util.List;
+
+@Entity
+@Table(name = "resumes")
+@Data
+public class Resume {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    private String title; // e.g., "Software Engineer Resume"
+
+    // FR-301: Multi-step form engine data
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ResumeSection> sections;
+
+    // FR-304: ATS Score
+    private Integer atsScore;
+    
+    @Column(columnDefinition = "TEXT")
+    private String atsFeedback;
+
+    // FR-302: Template selection
+    private String templateId;
+
+    @Version
+    private Integer version; // FR-307: Version history support
+}
+```
+
+#### 7. Service: Job Ingestion (Skeleton)
+Implements logic for **FR-101 (Scheduled Ingestion)** and **FR-103 (Duplicate Detection)**.
+
+```diff
+package com.kodnest.careers.service;
+
+import com.kodnest.careers.domain.job.JobPosting;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+
+@Service
+public class JobIngestionService {
+
+    // Placeholder for Repository injection
+    // private final JobPostingRepository repository;
+
+    /**
+     * FR-101: Scheduled job ingestion from configured sources.
+     * This would be triggered by a Scheduler (e.g., @Scheduled).
+     */
+    @Transactional
+    public void runIngestionPipeline() {
+        // 1. Fetch raw data from sources (Adapter pattern)
+        // 2. Parse and normalize (FR-102)
+        // 3. Deduplicate (FR-103)
+        // 4. Save
+    }
+
+    /**
+     * FR-102: Parse and normalize into canonical schema.
+     */
+    private JobPosting normalize(Object rawJobData) {
+        JobPosting job = new JobPosting();
+        // Mapping logic here
+        return job;
+    }
+
+    /**
+     * FR-103: Duplicate detection with source and similarity checks.
+     */
+    private boolean isDuplicate(String externalId) {
+        // Check database for existing externalId
+        return false; 
+    }
+}
+```
+
+<!--
+[PROMPT_SUGGESTION]Implement the JobPostingRepository and a REST Controller to expose the Job Notification Tracker API.[/PROMPT_SUGGESTION]
+[PROMPT_SUGGESTION]Create the ResumeSection entity and the logic for calculating a mock ATS score based on the PRD requirements.[/PROMPT_SUGGESTION]

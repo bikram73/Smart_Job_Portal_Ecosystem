@@ -8,16 +8,11 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Ready-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
 A full-stack TypeScript/React job portal application with intelligent job matching, ATS-optimized resume builder, application tracking, and personalized learning roadmaps.
 
-[Features](#-features) • [Getting Started](#-getting-started) • [Tech Stack](#-tech-stack) • [API Docs](#-api-endpoints) • [Contributing](#-contributing)
-
-
-![Smart-Job-Portal-Ecosystem](images/Dashboard.png)
-
-[![View More Images](https://img.shields.io/badge/View-More%20Images-blue)](MORE_IMAGES.md)
+[Features](#-features) • [Quick Start](#-quick-start) • [Tech Stack](#-tech-stack) • [Documentation](#-documentation)
 
 </div>
 
@@ -26,7 +21,7 @@ A full-stack TypeScript/React job portal application with intelligent job matchi
 ## ✨ Features
 
 ### 🎯 Core Features
-- **🔍 Job Discovery Engine**: Browse and search jobs with advanced filters
+- **🔍 Job Discovery Engine**: Browse and search 17+ job roles with advanced filters
 - **🤖 Smart Job Matching**: AI-powered matching based on skills and profile
 - **📄 Resume Builder**: Create ATS-optimized resumes with multiple templates
 - **📊 Application Tracker**: Track all applications with status updates and timeline
@@ -47,16 +42,16 @@ A full-stack TypeScript/React job portal application with intelligent job matchi
 
 **Backend:**
 - 🟢 Node.js with Express
-- 💾 SQLite with Sequelize ORM (no installation needed!)
+- 💾 SQLite / PostgreSQL with Sequelize ORM
 - 🔐 JWT authentication
 - 🌐 RESTful API architecture
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### 📋 Prerequisites
 - Node.js 18+ 
 - npm or yarn
-- ✅ No database installation needed! (Uses SQLite)
+- ✅ No database installation needed! (Uses SQLite by default)
 
 ### 📦 Installation
 
@@ -78,27 +73,54 @@ Create `server/.env`:
 PORT=5000
 JWT_SECRET=your_secret_key_here
 CLIENT_URL=http://localhost:3000
+
+# Optional: PostgreSQL (uses SQLite if not set)
+# POSTGRES_URL=postgresql://username:password@localhost:5432/job_portal
 ```
 
 **4. Run the application**
+
+**Windows:**
+```bash
+START.bat
+```
+
+**Mac/Linux:**
 ```bash
 npm run dev
 ```
 
 This will start:
-- 🎨 Frontend: http://localhost:3000
+- 🎨 Frontend: http://localhost:5173
 - ⚙️ Backend: http://localhost:5000
 
-### 💻 Development Commands
+### 🎯 First Time Setup
 
-Run frontend only:
+1. Visit http://localhost:5173
+2. Click "Register" to create an account
+3. Password requirements:
+   - Minimum 12 characters
+   - At least 1 uppercase letter
+   - At least 1 special character (!@#$%^&* etc.)
+4. Start exploring jobs!
+
+## 💻 Development Commands
+
 ```bash
+# Run both frontend and backend
+npm run dev
+
+# Run frontend only
 npm run client
-```
 
-Run backend only:
-```bash
+# Run backend only
 npm run server
+
+# Build for production
+npm run build
+
+# Reset database (Windows)
+RESET_DATABASE.bat
 ```
 
 ## 📁 Project Structure
@@ -119,7 +141,9 @@ Smart_Job_Portal_Ecosystem/
 │   ├── 📂 routes/           # API routes
 │   ├── 📂 middleware/       # Express middleware
 │   ├── 📂 services/         # Business logic
+│   ├── 📂 config/           # Configuration
 │   └── 📄 server.js         # Server entry point
+├── 📂 api/                  # Vercel serverless functions
 └── 📄 package.json          # Root package.json
 ```
 
@@ -144,7 +168,6 @@ Smart_Job_Portal_Ecosystem/
 
 ### 📄 Resumes
 - `GET /api/resumes` - Get user resumes
-- `GET /api/resumes/:id` - Get resume by ID
 - `POST /api/resumes` - Create resume
 - `PUT /api/resumes/:id` - Update resume
 - `DELETE /api/resumes/:id` - Delete resume
@@ -157,50 +180,90 @@ Smart_Job_Portal_Ecosystem/
 ### 🔔 Notifications
 - `GET /api/notifications` - Get notifications
 - `PUT /api/notifications/:id/read` - Mark as read
-- `PUT /api/notifications/read-all` - Mark all as read
 
-### 🎓 Roadmap
-- `GET /api/roadmap/:jobId` - Get learning roadmap for job
+## 🗄️ Database
 
-## 🎯 Features in Detail
+### SQLite (Default)
+No setup required! The app uses SQLite by default.
 
-### 🔍 Job Discovery
-- Search by keywords, location, job type
-- Filter by experience level, salary range
-- View detailed job descriptions
-- See skill match percentage
+### PostgreSQL (Production)
+For production deployment, use PostgreSQL:
 
-### 📊 Application Tracking
-- Save jobs for later
-- Track application status
-- Add notes and reminders
-- View application timeline
-- Identify skill gaps
+1. Set `POSTGRES_URL` in environment variables
+2. The app automatically switches to PostgreSQL
+3. See `POSTGRES_MIGRATION.md` for detailed guide
 
-### 📄 Resume Builder
-- Multiple professional templates
-- ATS score calculation
-- Job-specific optimization
-- PDF export
-- Real-time preview
+**Vercel Postgres:**
+```env
+POSTGRES_URL=postgres://default:xxxxx@xxxxx.postgres.vercel-storage.com/verceldb
+```
 
-### 🎓 Learning Roadmap
-- Skill gap analysis
-- Personalized learning paths
-- Interview preparation guides
-- Resource recommendations
-- Progress tracking
+## 🚢 Deployment
 
-## 🔮 Future Enhancements
+### Vercel (Recommended)
 
-- 🤖 AI Interview Simulator
-- 🏢 Employer Portal
-- ✨ Resume Auto-Improve AI
-- 💰 Salary Prediction
-- 🤝 Referral Network System
-- 🕷️ Job Scraping Engine (LinkedIn, Naukri, Indeed)
-- 📧 Email Notifications
-- 📊 Advanced Analytics
+1. Push to GitHub
+2. Import project to Vercel
+3. Add environment variables:
+   - `JWT_SECRET`
+   - `POSTGRES_URL` (optional)
+4. Deploy!
+
+See `DEBUG_VERCEL.md` for detailed instructions.
+
+## 📚 Documentation
+
+- `POSTGRES_MIGRATION.md` - PostgreSQL setup guide
+- `TROUBLESHOOTING.md` - Common issues and solutions
+- `DEBUG_VERCEL.md` - Vercel deployment debugging
+
+## 🎯 Available Job Roles
+
+The platform includes 17 pre-seeded job roles:
+- Full Stack Developer
+- Frontend Developer
+- Backend Developer
+- Data Analyst
+- DevOps Engineer
+- UI/UX Designer
+- Machine Learning Engineer
+- Mobile App Developer
+- QA Engineer
+- Product Manager
+- Cybersecurity Analyst
+- Cloud Architect
+- Business Analyst
+- Blockchain Developer
+- Technical Writer
+- Site Reliability Engineer
+
+## 🛠️ Troubleshooting
+
+### Registration Issues
+If registration fails:
+1. Clear browser Local Storage (F12 → Application → Local Storage)
+2. Ensure password meets requirements (12+ chars, uppercase, special char)
+3. Use a unique email address
+4. Check browser console for errors
+
+### Database Issues
+```bash
+# Reset database (Windows)
+RESET_DATABASE.bat
+
+# Or manually
+cd server
+npm run reset-db
+```
+
+### Port Conflicts
+```bash
+# Kill all Node processes (Windows)
+taskkill /f /im node.exe
+
+# Then restart
+npm run dev
+```
 
 ## 🤝 Contributing
 

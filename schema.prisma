@@ -1,0 +1,154 @@
+// DataSource and Generator
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ==========================================
+// 7.1 Platform and Identity (FR-001, FR-004)
+// ==========================================
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Hashed
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile   Profile?
+  auditLogs AuditLog[]
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+model Profile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  firstName   String
+  lastName    String
+  skills      String[] // JSON or array of strings
+  preferences Json?    // Job preferences
+  
+  resumes     Resume[]
+  prepPlans   PrepPlan[]
+  jobMatches  JobMatch[]
+}
+
+// ==========================================
+// 7.2 Job Notification Tracker (FR-101 to FR-108)
+// ==========================================
+
+model JobPosting {
+  id          String   @id @default(uuid())
+  title       String
+  company     String
+  location    String
+  description String   @db.Text
+  sourceUrl   String   @unique
+  postedAt    DateTime
+  skills      String[]
+  
+  // Relevance scoring fields
+  recencyScore Float?
+  
+  matches     JobMatch[]
+  createdAt   DateTime @default(now())
+}
+
+model JobMatch {
+  id           String      @id @default(uuid())
+  jobId        String
+  profileId    String
+  job          JobPosting  @relation(fields: [jobId], references: [id])
+  profile      Profile     @relation(fields: [profileId], references: [id])
+  
+  relevanceScore Float
+  status         JobStatus   @default(NEW)
+  
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@unique([jobId, profileId])
+}
+
+enum JobStatus {
+  NEW
+  SAVED
+  APPLIED
+  ARCHIVED
+}
+
+// ==========================================
+// 7.3 Placement Readiness Platform (FR-201 to FR-207)
+// ==========================================
+
+model PrepPlan {
+  id          String     @id @default(uuid())
+  profileId   String
+  profile     Profile    @relation(fields: [profileId], references: [id])
+  targetRole  String
+  generatedAt DateTime   @default(now())
+  
+  tasks       PrepTask[]
+  readinessScore Float   @default(0.0)
+}
+
+model PrepTask {
+  id          String   @id @default(uuid())
+  planId      String
+  plan        PrepPlan @relation(fields: [planId], references: [id])
+  category    RoundCategory
+  title       String
+  isCompleted Boolean  @default(false)
+  dueDate     DateTime?
+}
+
+enum RoundCategory {
+  APTITUDE
+  CODING
+  TECHNICAL
+  HR
+}
+
+// ==========================================
+// 7.4 AI Resume Builder (FR-301 to FR-307)
+// ==========================================
+
+model Resume {
+  id          String   @id @default(uuid())
+  profileId   String
+  profile     Profile  @relation(fields: [profileId], references: [id])
+  title       String
+  content     Json     // Structured resume data (sections)
+  atsScore    Float?
+  
+  assessments ATSAssessment[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ATSAssessment {
+  id          String   @id @default(uuid())
+  resumeId    String
+  resume      Resume   @relation(fields: [resumeId], references: [id])
+  score       Int
+  feedback    String   @db.Text
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  timestamp DateTime @default(now())
+}
