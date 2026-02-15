@@ -49,7 +49,7 @@ A full-stack TypeScript/React job portal application with intelligent job matchi
 ## 🚀 Quick Start
 
 ### 📋 Prerequisites
-- Node.js 18+ 
+- Node.js 20+ 
 - npm or yarn
 - ✅ No database installation needed! (Uses SQLite by default)
 
