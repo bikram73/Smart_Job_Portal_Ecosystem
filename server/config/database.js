@@ -4,8 +4,11 @@ require('dotenv').config();
 
 let sequelize;
 
-if (process.env.POSTGRES_URL) {
-  sequelize = new Sequelize(process.env.POSTGRES_URL, {
+// Check for DATABASE_URL or POSTGRES_URL
+const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+
+if (databaseUrl) {
+  sequelize = new Sequelize(databaseUrl, {
     dialect: 'postgres',
     logging: false,
     dialectModule: require('pg'),
@@ -27,7 +30,8 @@ if (process.env.POSTGRES_URL) {
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log(process.env.POSTGRES_URL ? 'PostgreSQL Database Connected' : 'SQLite Database Connected');
+    const dbType = (process.env.DATABASE_URL || process.env.POSTGRES_URL) ? 'PostgreSQL' : 'SQLite';
+    console.log(`${dbType} Database Connected`);
     
     // Use force: true in development to recreate tables, or just sync normally
     const syncOptions = process.env.NODE_ENV === 'production' 
