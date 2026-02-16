@@ -2,6 +2,8 @@
 
 # 🚀 Smart Job Portal Ecosystem
 
+![Smart-Job-Portal-Ecosystem](images/Dashboard.png)
+
 ### Your AI-Powered Career Companion
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
