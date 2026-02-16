@@ -4,6 +4,8 @@
 
 ![Smart-Job-Portal-Ecosystem](images/Dashboard.png)
 
+[![View More Images](https://img.shields.io/badge/View-More%20Images-blue)](MORE_IMAGES.md)
+
 ### Your AI-Powered Career Companion
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
